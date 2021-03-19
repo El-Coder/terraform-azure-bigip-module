@@ -9,13 +9,19 @@
         "myDns": {
             "class": "DNS",
             "nameServers": [
-                "8.8.8.8"
+                "8.8.8.8",
+                "2001:4860:4860::8844"
+            ],
+            "search": [
+                "f5lab.dev"
             ]
         },
         "myNtp": {
             "class": "NTP",
             "servers": [
-                "0.pool.ntp.org"
+                "0.pool.ntp.org",
+                "1.pool.ntp.org",
+                "2.pool.ntp.org"
             ],
             "timezone": "UTC"
         },
@@ -35,6 +41,77 @@
                     "role": "admin"
                 }
             }
+        },
+        "myProvisioning": {
+            "class": "Provision",
+            "ltm": "nominal",
+            "avr": "nominal"
+        },
+        "internal": {
+            "class": "VLAN",
+            "tag": 4093,
+            "mtu": 1500,
+            "interfaces": [
+                {
+                    "name": "1.1",
+                    "tagged": false
+                }
+            ],
+            "cmpHash": "dst-ip"
+        },
+        "internal-self": {
+            "class": "SelfIp",
+            "address": "10.1.10.100/24",
+            "vlan": "internal",
+            "allowService": "default",
+            "trafficGroup": "traffic-group-local-only"
+        },
+        "internal-floating": {
+            "class": "SelfIp",
+            "address": "10.1.10.120/24",
+            "vlan": "internal",
+            "allowService": "default",
+            "trafficGroup": "traffic-group-1"
+        },
+        "external": {
+            "class": "VLAN",
+            "tag": 4094,
+            "mtu": 1500,
+            "interfaces": [
+                {
+                    "name": "1.2",
+                    "tagged": false
+                }
+            ],
+            "cmpHash": "src-ip"
+        },
+        "external-self": {
+            "class": "SelfIp",
+            "address": "10.1.20.100/24",
+            "vlan": "external",
+            "allowService": "none",
+            "trafficGroup": "traffic-group-local-only"
+        },
+        "external-floating": {
+            "class": "SelfIp",
+            "address": "10.1.20.120/24",
+            "vlan": "external",
+            "allowService": "default",
+            "trafficGroup": "traffic-group-1"
+        },
+        "default": {
+            "class": "Route",
+            "gw": "10.1.10.1",
+            "network": "default",
+            "mtu": 1500
+        },
+        "configsync": {
+            "class": "ConfigSync",
+            "configsyncIp": "/Common/internal-self/address"
+        },
+        "failoverAddress": {
+            "class": "FailoverUnicast",
+            "address": "/Common/traffic-self/address"
         }
     }
 }
